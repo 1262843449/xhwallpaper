@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .container {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .tabs {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .tabs li {
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    .tabs a {
+        display: inline-block;
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .tabs a:hover {
+        background-color: #e8e8e8;
+    }
+
+    .wallpapers {
+        overflow: auto;
+    }
+
+    .wallpaper-group {
+        width: calc(25% - 10px);
+        height: 200px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        float: left;
+        text-align: center;
+
+    }
+
+    .wallpaper-group img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+
+
+    }
+
+    body {
+        background-size: cover;
+
+    }
+
+    .wallpaper-group img.selected {
+        outline: 4px solid #06c;
+    }
+
+    /*  鼠标滑过 */
+    .wallpaper-group img:hover {
+        transform: scale(1.1);
+        opacity: 0.8;
+        transition: all 0.3s ease-in-out;
+    }
+
+
+    /*加入收藏*/
+</style>
+
+<body>
+    <div class="container">
+        <ul class="tabs">
+            <li><a href="#colors">纯色</a></li>
+            <li><a href="#official">官方壁纸</a></li>
+            <li><a href="#custom">自定义壁纸</a></li>
+            <li><a href="#favorites">我的收藏</a></li>
+            <li><a href="#bing">必应壁纸</a></li>
+        </ul>
+        <div class="wallpapers">
+            <div id="colors" class="wallpaper-group">
+                <img src="/images/huangse.png" alt="color 2">
+                <img src="/images/baise.png" alt="color 1">
+                <img src="/images/lvse.png" alt="color 3">
+                <img src="/images/fense.png" alt="color 4">
+                <img src="/images/lanse.png" alt="color 5">
+                <img src="/images/zise.png" alt="color 6">
+                <img src="/images/hongse.png" alt="color 7">
+                <!-- 其他颜色图片 -->
+            </div>
+            <div id="official" class="wallpaper-group">
+                <img src="/images/4.jpg" alt="官方壁纸1">
+                <img src="/images/5.jpg" alt="官方壁纸2">
+                <img src="/images/6.jpg" alt="官方壁纸3">
+                <!-- 官方壁纸 -->
+            </div>
+            <div id="custom" class="wallpaper-group">
+                <img src="/images/7.jpg" alt="自定义壁纸1">
+                <img src="/images/8.jpg" alt="自定义壁纸2">
+                <img src="/images/9.jpg" alt="自定义壁纸3">
+                <!-- 其他自定义壁纸 -->
+            </div>
+            <div id="favorites" class="wallpaper-group">
+                <!-- 我的收藏图片 -->
+            </div>
+            <div id="bing" class="wallpaper-group">
+                <img src="/images/10.jpg" alt="b壁纸3">
+                <img src="/images/1.jpg" alt="b壁纸1">
+                <img src="/images/2.jpg" alt="b壁纸2">
+                <img src="/images/3.jpg" alt="b壁纸3">
+                <!-- 必应壁纸 -->
+            </div>
+        </div>
+    </div>
+    <script>
+        // 在页面加载完成后执行以下脚本
+
+        // 获取所有选项卡和壁纸组
+        const tabs = document.querySelectorAll('.tabs a');
+        const wallpapers = document.querySelectorAll('.wallpaper-group img');
+
+        // 给所有选项卡添加点击事件处理程序
+        tabs.forEach(tab => {
+            tab.addEventListener('click', e => {
+                e.preventDefault(); // 阻止默认行为
+                const id = tab.getAttribute('href'); // 获取对应的壁纸组id
+                const target = document.querySelector(id); // 获取目标壁纸组
+                wallpapers.forEach(wallpaper => {
+                    wallpaper.style.display = 'none'; // 隐藏所有壁纸图片
+                    wallpaper.classList.remove('selected'); // 取消选中效果
+                });
+                target.querySelectorAll('img').forEach(wallpaper => {
+                    wallpaper.style.display = 'block'; // 显示对应类型的壁纸图片
+                });
+            });
+        });
+
+        // 给所有壁纸图片添加点击事件处理程序
+        wallpapers.forEach(wallpaper => {
+            wallpaper.addEventListener('click', e => {
+                e.preventDefault(); // 阻止默认行为
+                wallpapers.forEach(wp => {
+                    wp.classList.remove('selected'); // 移除其他壁纸图片的选中效果
+                });
+                wallpaper.classList.add('selected'); // 添加当前壁纸图片的选中效果
+                const url = wallpaper.getAttribute('src'); // 获取选中的壁纸图片路径
+                document.body.style.backgroundImage = `url(${url})`; // 更换body的背景图片
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>

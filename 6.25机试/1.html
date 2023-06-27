@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Wallpaper Manager</title>
+    <meta charset="utf-8">
+
+</head>
+<style>
+    body {
+        background-color: #777;
+    }
+
+    header {
+        background-color: #ddd;
+        padding: 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+    }
+
+    nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    nav li {
+        font-size: 16px;
+        font-weight: bold;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    nav li.active {
+        color: #333;
+        border-bottom: 2px solid #333;
+    }
+
+    main {
+        margin-top: 100px;
+        padding: 20px;
+        position: relative;
+    }
+
+    #wallpapers-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 20px;
+        height: 520px;
+        overflow: auto;
+    }
+
+    .loading {
+        text-align: center;
+        font-size: 24px;
+        margin-top: 50px;
+    }
+
+    .wallpaper {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .wallpaper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s;
+    }
+
+    .wallpaper.selected::before {
+        content: '\2713';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        font-size: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+
+    .wallpaper:hover img {
+        transform: scale(1.2);
+    }
+
+    .wallpaper.selected::before {
+        opacity: 1;
+    }
+
+    #pager-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    #prev-button,
+    #next-button {
+        font-size: 24px;
+        padding: 5px 10px;
+        border: none;
+        background-color: #ddd;
+        cursor: pointer;
+    }
+
+    #prev-button:disabled,
+    #next-button:disabled {
+        background-color: #ccc;
+    }
+
+    #page-number {
+        font-size: 16px;
+        margin: 0 10px;
+    }
+
+    footer {
+        background-color: #ddd;
+        padding: 20px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        text-align: center;
+    }
+
+    #set-wallpaper-button {
+        font-size: 16px;
+        padding: 10px 20px;
+        border: none;
+        background-color: #333;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    #set-wallpaper-button:disabled {
+        background-color: #aaa;
+        cursor: not-allowed;
+    }
+</style>
+
+<body>
+    <header>
+        <h1>Wallpaper Manager</h1>
+        <nav>
+            <ul>
+                <li class="active" data-tab="solid">Solid Color</li>
+                <li data-tab="official">Official Wallpaper</li>
+                <li data-tab="custom">Custom Wallpaper</li>
+                <li data-tab="favorites">My Favorites</li>
+                <li data-tab="bing">Bing Wallpaper</li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="wallpapers-container">
+            <div class="loading">Loading...</div>
+        </div>
+
+        <div id="pager-container">
+            <button id="prev-button">&lt;</button>
+            <span id="page-number"></span>
+            <button id="next-button">&gt;</button>
+        </div>
+    </main>
+
+    <footer>
+        <button id="set-wallpaper-button" disabled>Set as Wallpaper</button>
+    </footer>
+    <script src="api.js">
+        // 定义选项卡的类型和标签
+        const TABS = [
+            { id: 'solid', label: 'Solid Color' },
+            { id: 'official', label: 'Official Wallpaper' },
+            { id: 'custom', label: 'Custom Wallpaper' },
+            { id: 'favorites', label: 'My Favorites' },
+            { id: 'bing', label: 'Bing Wallpaper' }
+        ];
+
+        let currentPage = 1; // 当前页码
+        let totalPages = 1; // 总页数
+        let selectedWallpaper = null; // 已选择的壁纸
+
+        const wallpapersContainer = document.querySelector('#wallpapers-container'); // 壁纸容器
+        const pageNumberLabel = document.querySelector('#page-number'); // 分页标签
+        const setWallpaperButton = document.querySelector('#set-wallpaper-button'); // 设置壁纸按钮
+
+        // 加载壁纸数据
+        function loadWallpapers(type, page) {
+            wallpapersContainer.innerHTML = '<div class="loading">Loading...</div>';
+
+            // 模拟异步请求
+            setTimeout(() => {
+                const results = [];
+
+                // TODO: 根据类型和页码获取壁纸数据
+
+                renderWallpapers(results);
+            }, 1000);
+        }
+
+        // 渲染壁纸到页面中
+        function renderWallpapers(wallpapers) {
+            wallpapersContainer.innerHTML = '';
+
+            if (wallpapers.length === 0) {
+                wallpapersContainer.innerHTML = '<div class="loading">No wallpapers found.</div>';
+                return;
+            }
+
+            const wallpaperRows = [];
+            let currentRow = null;
+
+            wallpapers.forEach((wallpaper, index) => {
+                if (index % 4 === 0) { // 创建新的一行
+                    currentRow = document.createElement('div');
+                    currentRow.className = 'row';
+                    wallpaperRows.push(currentRow);
+                }
+
+                const wallpaperElement = document.createElement('div');
+                wallpaperElement.className = 'wallpaper';
+                wallpaperElement.innerHTML = `<img src="${wallpaper.url}" alt="${wallpaper.title}">`;
+
+                wallpaperElement.addEventListener('click', () => {
+                    selectWallpaper(wallpaper);
+                });
+
+                currentRow.appendChild(wallpaperElement);
+            });
+
+            wallpaperRows.forEach(row => {
+                wallpapersContainer.appendChild(row);
+            });
+
+            selectedWallpaper = null;
+            setWallpaperButton.disabled = true;
+        }
+
+        // 选择壁纸
+        function selectWallpaper(wallpaper) {
+            if (selectedWallpaper) {
+                selectedWallpaper.classList.remove('selected');
+            }
+
+            selectedWallpaper = event.currentTarget;
+            selectedWallpaper.classList.add('selected');
+
+            setWallpaperButton.disabled = false;
+        }
+
+        // 设置壁纸
+        function setWallpaper() {
+            if (!selectedWallpaper) {
+                return;
+            }
+
+            const imageUrl = selectedWallpaper.querySelector('img').src;
+            document.body.style.backgroundImage = `url(${imageUrl})`;
+        }
+
+        // 切换选项卡
+        function switchTab(tabId) {
+            const activeTab = document.querySelector('nav li.active');
+            activeTab.classList.remove('active');
+
+            const tab = document.querySelector(`nav li[data-tab="${tabId}"]`);
+            tab.classList.add('active');
+
+            loadWallpapers(tabId, currentPage); // 加载指定类型的壁纸
+            currentTabId = tabId; // 更新当前选中的选项卡 ID
+        }
+
+        // 更新分页信息
+        function updatePager() {
+            pageNumberLabel.textContent = `${currentPage} / ${totalPages}`;
+
+            const prevButton = document.querySelector('#prev-button');
+            prevButton.disabled = currentPage === 1;
+
+            const nextButton = document.querySelector('#next-button');
+            nextButton.disabled = currentPage === totalPages;
+        }
+
+        // 翻到上一页
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadWallpapers(currentTabId, currentPage);
+            }
+        }
+
+        // 翻到下一页
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadWallpapers(currentTabId, currentPage);
+            }
+        }
+
+        // 初始化
+        let currentTabId = TABS[0].id; // 默认选中第一个选项卡
+        loadWallpapers(currentTabId, currentPage); // 加载默认类型的壁纸
+
+        // 给每个选项卡按钮绑定点击事件
+        document.querySelectorAll('nav li').forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchTab(tab.dataset.tab);
+            });
+        });
+
+        setWallpaperButton.addEventListener('click', setWallpaper); // 绑定设置壁纸按钮的点击事件
+
+        // 给分页按钮绑定点击事件
+        document.querySelector('#prev-button').addEventListener('click', prevPage);
+        document.querySelector('#next-button').addEventListener('click', nextPage);
+
+
+
+
+
+        // 加载壁纸数据
+        function loadWallpapers(type, page) {
+            wallpapersContainer.innerHTML = '<div class="loading">Loading...</div>';
+
+            fetch(`/api/wallpapers?type=${type}&page=${page}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderWallpapers(data.wallpapers);
+                    currentPage = data.page;
+                    totalPages = data.totalPages;
+                    updatePager();
+                })
+                .catch(error => {
+                    console.error(error);
+                    wallpapersContainer.innerHTML = '<div class="loading">Failed to load wallpapers.</div>';
+                });
+        }
+    </script>
+</body>
+
+</html>
